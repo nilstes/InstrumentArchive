@@ -1,0 +1,25 @@
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.logo, h1.logo {
+    margin: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: Georgia, Times, 'Times New Roman', serif;
+    color: darkblue;
+}
+
+.static-form-group {
+    float: left;
+    margin-right: 25px;
+}
+
+td {
+    vertical-align: middle;
+}

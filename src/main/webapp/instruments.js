@@ -1,0 +1,104 @@
+function initTable(table) {
+    $.ajax({
+        url: 'webresources/instruments',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            for(i=0; i<data.length; i++) {
+                var lastStatus = data[i].statuses.length > 0?data[i].statuses[data[i].statuses.length-1]:"";
+                table.row.add([
+                    getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
+                    data[i].type,
+                    data[i].make,
+                    data[i].lentTo,
+                    lastStatus
+                ]);
+            }
+            table.draw();
+            
+            // Register callbacks
+            for(i=0; i<data.length; i++) {
+                $("#delete" + i).click({instrument: data[i]}, function(event) {
+                    bootbox.confirm("Er du sikker på at du vil slette instrument " + event.data.instrument.make + " " + event.data.instrument.type + "?", function(result) {    
+                        $.ajax({
+                            url: 'webresources/instruments/' + event.data.instrument.id,
+                            type: 'DELETE',
+                            success: function(data) {
+                                table.clear();
+                                initTable(table);
+                            },
+                            error: function() {
+                                window.location.href = "error.html";
+                            }                   
+                        });
+                    });                  
+                });
+                $("#edit" + i).click({id: data[i].id}, function(event) {
+                    window.location.href = "instrument.html?id=" + event.data.id;
+                });
+            }
+        },
+        error: function() {
+            window.location.href = "error.html";
+        }
+    });
+}
+
+$(document).ready(function() {
+    var t = $('#instruments').DataTable( {
+        "paging": true,
+        "lengthChange": false,
+        "info": false,
+        "searching": true,
+        "order": [[ 1, "asc" ]]
+    });
+    
+    $.getJSON('webresources/instruments/types', function(data) {
+        $.each(data, function(key, value) {   
+            $('#type')
+                .append($("<option></option>")
+                .attr("value", value.id)
+                .text(value.name)); 
+        });        
+    });
+    
+    $.getJSON('webresources/instruments/makes', function(data) {
+        $.each(data, function(key, value) {   
+            $('#makes')
+                .append($("<option></option>")
+                .attr("value", value)); 
+        });        
+    });
+    
+    getLoggedOnUser(function(data) {
+        $("#logout").html(data.email + ": logg ut");
+        initTable(t);
+    });
+    
+    $("#newInstrumentForm").submit(function(event) {
+        // Stop form from submitting normally
+        event.preventDefault();
+        
+        // Save new user
+        $.ajax({
+            type: "POST",
+            url: "webresources/instruments",
+            data: JSON.stringify({
+                type: $("#type").val(), 
+                make: $("#make").val(),
+                productNo: $("#productNo").val(),
+                serialNo: $("#serialNo").val(),
+                description: $("#description").val()
+            }),
+            contentType: "application/json",
+            success: function (data, textStatus, jqXHR) {
+                t.clear();
+                initTable(t);
+                $('#newInstrumentModal').modal('hide');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                window.location.href = "error.html";
+            }
+        });    
+    });
+});

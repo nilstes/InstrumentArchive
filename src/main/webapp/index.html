@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Logg inn i instrumentarkiv</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="css/signin.css" rel="stylesheet">
+        <link href="css/navbar.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Static navbar -->
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <div class="logo">Instrumentarkiv</div>
+                    </div>
+                </div><!--/.container-fluid -->
+            </nav>
+
+            <div class="panel panel-info">
+                <div class="panel-body">            
+                    <form class="form-signin" id="loginForm">
+                        <label for="inputEmail" class="sr-only">Epost</label>
+                        <input type="email" id="inputEmail" class="form-control" placeholder="Epost" required autofocus>
+                        <label for="inputPassword" class="sr-only">Passord</label>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Passord" required>
+                        <div class="alert alert-danger hide" id="wrongPasswordAlert">
+                            <strong>Feil brukernavn eller passord!</strong> 
+                        </div>
+                        <button type="submit" class="btn btn-lg btn-primary btn-block">Logg på</button>
+                    </form>
+                </div>
+            </div>
+        </div> <!-- /container -->
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>        
+        <script src="index.js"></script>
+    </body>
+</html>

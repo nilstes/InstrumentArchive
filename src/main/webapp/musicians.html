@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Instrumentarkiv</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">       
+        <link href="css/dataTables.bootstrap.min.css" rel="stylesheet">
+        <link href="css/responsive.bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="css/navbar.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Static navbar -->
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <div class="logo">Instrumentarkiv</div>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="instruments.html">Instrumenter</a></li>
+                            <li class="active"><a href="#">Musikanter</a></li>
+                            <li><a href="admin.html">Admin</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="index.html" id="logout">Logg av</a></li>
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div><!--/.container-fluid -->
+            </nav>
+          
+            <div class="panel panel-info">
+                <div class="panel-heading clearfix">
+                    <h4 class="pull-left">Musikanter</h4>
+                    <div class="btn-group pull-right">
+                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#newMusicianModal" id="newMusician">Ny musikant</a>
+                    </div>
+                </div>   
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table id="musicians" class="table table-striped table-bordered nowrap" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th data-sortable="false"></th>
+                                    <th>Fornavn</th>
+                                    <th>Etternavn</th>
+                                    <th>Instrumenter</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- New Musician Modal -->
+            <div id="newMusicianModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Ny musikant</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form role="form" id="newMusicianForm">
+                                <div class="form-group">
+                                  <label for="firstName">Fornavn:</label>
+                                  <input type="text" class="form-control" id="newMusicianFirstName" placeholder="Skriv inn fornavn">
+                                </div>                                
+                                <div class="form-group">
+                                  <label for="firstName">Etternavn:</label>
+                                  <input type="text" class="form-control" id="newMusicianLastName" placeholder="Skriv inn etternavn">
+                                </div>
+                                <button type="submit" class="btn btn-default">Lagre</button>
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Avbryt</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Edit Musician Modal -->
+            <div id="editMusicianModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Endre musikant</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form role="form" id="editMusicianForm">
+                                <input type="hidden" id="editMusicianId">
+                                <div class="form-group">
+                                    <label for="firstName">Fornavn:</label>
+                                    <input type="text" class="form-control" id="editMusicianFirstName" placeholder="Skriv inn fornavn">
+                                </div>                                
+                                <div class="form-group">
+                                    <label for="firstName">Etternavn:</label>
+                                    <input type="text" class="form-control" id="editMusicianLastName" placeholder="Skriv inn etternavn">
+                                </div>                                
+                                <button type="submit" class="btn btn-default">Lagre</button>
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Avbryt</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /container -->
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootbox.min.js"></script>
+        <script src="js/jquery.dataTables.min.js"></script>
+        <script src="js/dataTables.bootstrap.min.js"></script>
+        <script src="common.js"></script>    
+        <script src="musicians.js"></script>    
+    </body>
+</html>
