@@ -3,6 +3,7 @@ package db;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,14 +21,14 @@ public class Db {
     private Db() {
         try {
             Class.forName("org.h2.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:h2:~/" + DB_NAME, DB_NAME, "");
+            Connection connection = getConnection();
             try {
                 Statement statement = connection.createStatement();
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS user ( email VARCHAR(256) PRIMARY KEY, password VARCHAR(256) )");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument ( id VARCHAR(256) PRIMARY KEY, type VARCHAR(256), make VARCHAR(256), serial VARCHAR(256), product_no VARCHAR(256), description VARCHAR(256) )");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS musician ( id VARCHAR(256) PRIMARY KEY, first_name VARCHAR(256), last_name VARCHAR(256) )");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument_type ( id VARCHAR(256) PRIMARY KEY, name VARCHAR(256) )");
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument_state ( instrument_id VARCHAR(256) PRIMARY KEY, date DATETIME, state LONGVARCHAR, state_by_user VARCHAR(256))");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument_state ( instrument_id VARCHAR(256), date DATETIME, state LONGVARCHAR, state_by_user VARCHAR(256))");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS musician_instrument ( instrument_id VARCHAR(256), musician_id VARCHAR(256), out_at DATETIME, out_by_user VARCHAR(256), in_at DATETIME, in_by_user VARCHAR(256) )");
                 
                 statement.executeUpdate("MERGE INTO instrument_type values ('1', 'Kornett')");
@@ -72,5 +73,33 @@ public class Db {
         // todo FIXME This is not a good way to get connections
         // Use a pool instead
         return DriverManager.getConnection("jdbc:h2:~/" + DB_NAME, DB_NAME, "");
+    }
+    
+    public void dump(String filename) throws SQLException {
+        Connection connection = getConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SCRIPT TO ?");
+            statement.setString(1, filename);
+            statement.execute();
+        } catch (Exception exception) {
+            log.log(Level.SEVERE, "Failed to dump DB", exception);
+            throw exception;
+        } finally {
+            connection.close();
+        }
+    }
+    
+    public static void restore(String filename) throws SQLException {
+        Connection connection = DriverManager.getConnection("jdbc:h2:~/" + DB_NAME, DB_NAME, "");
+        try {
+            PreparedStatement statement = connection.prepareStatement("RUNSCRIPT FROM ?");
+            statement.setString(1, filename);
+            statement.execute();
+        } catch (Exception exception) {
+            log.log(Level.SEVERE, "Failed to restore DB", exception);
+            throw exception;
+        } finally {
+            connection.close();
+        }
     }
 }

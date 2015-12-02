@@ -6,13 +6,13 @@ import java.util.Date;
 /**
  * @author nilstes
  */
-public class Status implements Serializable {
+public class InstrumentStatus implements Serializable {
     private String instrumentId;
     private Date date;
     private String text;
     private String statusByUser;
 
-    public Status() {
+    public InstrumentStatus() {
     }
 
     public String getInstrumentId() {

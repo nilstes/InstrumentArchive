@@ -2,13 +2,15 @@ package services;
 
 import data.Instrument;
 import data.InstrumentFilter;
+import data.InstrumentLoan;
 import data.InstrumentType;
-import data.Status;
+import data.InstrumentStatus;
 import db.InstrumentDao;
 import db.UserDao;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +44,7 @@ public class InstrumentService extends SecureService {
     @POST
     @Consumes("application/json")
     public void add(Instrument instrument) {       
-        checkLogon();
+        String loggedOnUser = checkLogon();
         
         if(instrument.getId() == null) {
             instrument.setId(new BigInteger(256, random).toString(36));
@@ -52,6 +54,15 @@ public class InstrumentService extends SecureService {
         try {
             instrumentDao.addInstrument(instrument);
             log.info("Added instrument");        
+            if(instrument.getStatus() != null && instrument.getStatus().length() > 0) {
+                InstrumentStatus status = new InstrumentStatus();
+                status.setDate(new Date());
+                status.setInstrumentId(instrument.getId());
+                status.setStatusByUser(loggedOnUser);
+                status.setText(instrument.getStatus());
+                instrumentDao.addInstrumentState(status);
+                log.info("Added initial instrument status");        
+            }
         } catch(SQLException e) {
             log.log(Level.SEVERE, "Failed to add instrument", e);        
             throw new ServerErrorException("Failed to add transaction", Response.Status.INTERNAL_SERVER_ERROR, e);
@@ -59,23 +70,28 @@ public class InstrumentService extends SecureService {
     }
 
     @POST
-    @Path("/{id}/states")
-    @Consumes("application/json")
-    public void addState(Status status) {       
-        checkLogon();
+    @Path("/{id}/statuses")
+    @Consumes("text/plain")
+    public void addState(@PathParam("id") String instrumentId, String status) {       
+        String loggedOnUser = checkLogon();
+        InstrumentStatus is = new InstrumentStatus();
+        is.setStatusByUser(loggedOnUser);
+        is.setDate(new Date());
+        is.setInstrumentId(instrumentId);
+        is.setText(status);
         
         // Add instrument state
-//        try {
-//            instrumentDao.addInstrumentState(status);
-//            log.info("Added instrument state");        
-//        } catch(SQLException e) {
-//            log.log(Level.SEVERE, "Failed to add instrument state", e);        
-//            throw new ServerErrorException("Failed to add instrument state", Response.Status.INTERNAL_SERVER_ERROR, e);
-//        }
+        try {
+            instrumentDao.addInstrumentState(is);
+            log.info("Added instrument state");        
+        } catch(SQLException e) {
+            log.log(Level.SEVERE, "Failed to add instrument state", e);        
+            throw new ServerErrorException("Failed to add instrument state", Response.Status.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @POST
-    @Path("/{id}/loan")
+    @Path("/{id}/loans")
     @Consumes("text/plain")
     public void addLoan(@PathParam("id") String instrumentId, String musicianId) {       
         String loggedOnUser = checkLogon();
@@ -94,7 +110,7 @@ public class InstrumentService extends SecureService {
     }
 
     @DELETE
-    @Path("/{id}/loan")
+    @Path("/{id}/loans")
     @Consumes("text/plain")
     public void endLoan(@PathParam("id") String instrumentId) {       
         String loggedOnUser = checkLogon();
@@ -112,6 +128,34 @@ public class InstrumentService extends SecureService {
         }
     }
 
+    @GET
+    @Path("/{id}/loans")
+    @Produces("application/json")
+    public List<InstrumentLoan> getLoans(@PathParam("id") String instrumentId) {
+        checkLogon();
+        
+        try {
+            return instrumentDao.getLoans(instrumentId);
+        } catch(SQLException e) {
+            log.log(Level.SEVERE, "Failed to get instrument loans", e);        
+            throw new ServerErrorException("Failed to instrument loans", Response.Status.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+    
+    @GET
+    @Path("/{id}/statuses")
+    @Produces("application/json")
+    public List<InstrumentStatus> getStatuses(@PathParam("id") String instrumentId) {
+        checkLogon();
+        
+        try {
+            return instrumentDao.getInstrumentStatuses(instrumentId);
+        } catch(SQLException e) {
+            log.log(Level.SEVERE, "Failed to get instrument statuses", e);        
+            throw new ServerErrorException("Failed to instrument statuses", Response.Status.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+    
     @PUT
     @Consumes("application/json")
     public void update(Instrument instrument) {       
@@ -185,7 +229,7 @@ public class InstrumentService extends SecureService {
             throw new ServerErrorException("Failed to instrument types", Response.Status.INTERNAL_SERVER_ERROR, e);
         }
     }
-
+      
     @GET
     @Path("/makes")
     @Produces("application/json")

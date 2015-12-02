@@ -2,6 +2,7 @@ package data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,8 +15,9 @@ public class Instrument implements Serializable {
     private String productNo;
     private String serialNo;
     private String description;
-    private String lentToName;
-    private List<Status> statuses = new ArrayList<Status>();
+    private String lentTo;
+    private String status;
+    private Date statusDate;
 
     public Instrument() {
     }
@@ -69,20 +71,28 @@ public class Instrument implements Serializable {
     }
 
     public String getLentTo() {
-        return lentToName;
+        return lentTo;
     }
 
-    public void setLentTo(String lentToName) {
-        this.lentToName = lentToName;
+    public void setLentTo(String lentTo) {
+        this.lentTo = lentTo;
     }
 
-    public List<Status> getStatuses() {
-        return statuses;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatuses(List<Status> statuses) {
-        this.statuses = statuses;
+    public void setStatus(String status) {
+        this.status = status;
     }
-    
-    
+
+    public Date getStatusDate() {
+        return statusDate;
+    }
+
+    public void setStatusDate(Date statusDate) {
+        this.statusDate = statusDate;
+    }
+
+
 }

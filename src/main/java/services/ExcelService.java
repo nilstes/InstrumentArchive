@@ -3,7 +3,7 @@ package services;
 import data.Instrument;
 import data.InstrumentFilter;
 import data.Musician;
-import data.Status;
+import data.InstrumentStatus;
 import db.InstrumentDao;
 import db.MusicianDao;
 import java.io.IOException;
@@ -94,8 +94,6 @@ public class ExcelService extends SecureService {
         createHeaders(workbook, sheet, Arrays.asList("Type", "Merke", "Produktnummer", "Serienummer", "Beskrivelse", "Utlånt til", "Siste status", "Dato status"));
         for(int i=0; i<instruments.size(); i++) {
             HSSFRow row = sheet.createRow(i+1);
-            List<Status> statuses = instruments.get(i).getStatuses();
-            Status lastStatus = statuses.size()==0?null:statuses.get(statuses.size()-1);
             String lentTo = instruments.get(i).getLentTo();
             createTextCell(row, instruments.get(i).getType(), 0);
             createTextCell(row, instruments.get(i).getMake(), 1);
@@ -103,8 +101,8 @@ public class ExcelService extends SecureService {
             createTextCell(row, instruments.get(i).getSerialNo(), 3);
             createTextCell(row, instruments.get(i).getDescription(), 4);
             createTextCell(row, lentTo==null?"":lentTo, 5);
-            createTextCell(row, lastStatus==null?"":lastStatus.getText(), 6);
-            createTextCell(row, lastStatus==null?"":lastStatus.getDate().toString(), 7);
+            createTextCell(row, instruments.get(i).getStatus(), 6);
+            createTextCell(row, instruments.get(i).getStatusDate().toString(), 7);
         }
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);

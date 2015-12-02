@@ -18,17 +18,19 @@ function initTable(table) {
             for(i=0; i<data.length; i++) {
                 $("#delete" + i).click({email: data[i].email}, function(event) {
                     bootbox.confirm("Er du sikker på at du vil slette bruker " + event.data.email + "?", function(result) {    
-                        $.ajax({
-                            url: 'webresources/users/' + event.data.email,
-                            type: 'DELETE',
-                            success: function(data) {
-                                table.clear();
-                                initTable(table);
-                            },
-                            error: function() {
-                                window.location.href = "error.html";
-                            }                   
-                        });
+                        if(result) {
+                            $.ajax({
+                                url: 'webresources/users/' + event.data.email,
+                                type: 'DELETE',
+                                success: function(data) {
+                                    table.clear();
+                                    initTable(table);
+                                },
+                                error: function() {
+                                    window.location.href = "error.html";
+                                }                   
+                            });
+                        }
                     });                  
                 });
                 $("#edit" + i).click({i: i}, function(event) {

@@ -2,8 +2,9 @@ package db;
 
 import data.Instrument;
 import data.InstrumentFilter;
+import data.InstrumentLoan;
 import data.InstrumentType;
-import data.Status;
+import data.InstrumentStatus;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -75,7 +76,6 @@ public class InstrumentDao {
                 i.setMake(rs.getString("make"));
                 i.setProductNo(rs.getString("product_no"));
                 i.setSerialNo(rs.getString("serial"));
-                i.setStatuses(new ArrayList<Status>());
                 i.setType(rs.getString("name"));
                 instruments.add(i);
             }               
@@ -83,6 +83,7 @@ public class InstrumentDao {
             statement.close();
             log.info("Found " + instruments.size() + " instruments");
             getCurrentLoans(connection, instruments);
+            getLastStatuses(connection, instruments);
             return instruments;
         } finally {
             connection.close();
@@ -103,6 +104,24 @@ public class InstrumentDao {
             int result = s.executeUpdate();
             s.close();
             log.info("Add instrument " + (result == 1?"ok":"failed"));
+            return result == 1;
+        } finally {
+            connection.close();
+        }        
+    }
+    
+    public boolean addInstrumentState(InstrumentStatus status) throws SQLException {
+        Connection connection = Db.instance().getConnection();
+        try {
+            PreparedStatement s = connection.prepareStatement("INSERT INTO instrument_state (instrument_id,date,state,state_by_user) VALUES(?,?,?,?)");
+            s.setString(1, status.getInstrumentId());
+            s.setTimestamp(2, new Timestamp(status.getDate().getTime()));
+            s.setString(3, status.getText());
+            s.setString(4, status.getStatusByUser());
+            log.fine(s.toString());
+            int result = s.executeUpdate();
+            s.close();
+            log.info("Add instrument state " + (result == 1?"ok":"failed"));
             return result == 1;
         } finally {
             connection.close();
@@ -167,11 +186,28 @@ public class InstrumentDao {
             log.info("Get instrument " + (instrument != null?"ok":"failed"));
             if(instrument != null) {
                 getCurrentLoans(connection, Arrays.asList(instrument));
+                getLastStatuses(connection, Arrays.asList(instrument));
             }
             return instrument;
         } finally {
             connection.close();
         }
+    }
+
+    private void getLastStatuses(Connection connection, List<Instrument> instruments) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT max(date) as lastDate, state from instrument_state where instrument_id=? group by state");
+        for(Instrument instrument : instruments) {
+            statement.setString(1, instrument.getId());
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()) {
+                log.info("Found state");
+                instrument.setStatus(rs.getString("state"));
+                instrument.setStatusDate(rs.getTimestamp("lastDate"));
+            }
+            rs.close();
+        }
+        statement.close();
+        log.info("Get instrument last statuses ok");
     }
 
     private void getCurrentLoans(Connection connection, List<Instrument> instruments) throws SQLException {
@@ -185,7 +221,7 @@ public class InstrumentDao {
             rs.close();
         }
         statement.close();
-        log.info("Get instrument loans ok");
+        log.info("Get current instrument loans ok");
     }
 
     public boolean hasCurrentLoan(String instrumentId) throws SQLException {
@@ -211,7 +247,6 @@ public class InstrumentDao {
         i.setMake(rs.getString("make"));
         i.setProductNo(rs.getString("product_no"));
         i.setSerialNo(rs.getString("serial"));
-        i.setStatuses(new ArrayList<Status>());
         i.setType(rs.getString("name"));
         return i;
     }
@@ -237,7 +272,7 @@ public class InstrumentDao {
     public boolean endLoan(String instrumentId, String loggedOnUser) throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
-            PreparedStatement s = connection.prepareStatement("UPDATE musician_instrument SET in_at=?, in_by_user=? where instrument_id=?");
+            PreparedStatement s = connection.prepareStatement("UPDATE musician_instrument SET in_at=?, in_by_user=? where instrument_id=? and in_at is null");
             s.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
             s.setString(2, loggedOnUser);
             s.setString(3, instrumentId);
@@ -249,5 +284,50 @@ public class InstrumentDao {
         } finally {
             connection.close();
         }        
+    }
+
+    public List<InstrumentLoan> getLoans(String instrumentId) throws SQLException {
+        Connection connection = Db.instance().getConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT first_name,last_name,out_at,out_by_user,in_at,in_by_user FROM musician_instrument mi inner join musician m on mi.musician_id=m.id where instrument_id=? order by out_at desc");
+            statement.setString(1, instrumentId);
+            ResultSet rs = statement.executeQuery();
+            List<InstrumentLoan> loans = new ArrayList<InstrumentLoan>();
+            while(rs.next()) {
+                loans.add(new InstrumentLoan(rs.getString("first_name") + " " + rs.getString("last_name"), rs.getTimestamp("out_at"), rs.getString("out_by_user"), rs.getTimestamp("in_at"), rs.getString("in_by_user")));
+            }
+            rs.close();
+
+            statement.close();
+            log.info("Get instrument loans ok");
+            return loans;
+        } finally {
+            connection.close();
+        }    
+    }
+
+    public List<InstrumentStatus> getInstrumentStatuses(String instrumentId) throws SQLException {
+        Connection connection = Db.instance().getConnection();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM instrument_state where instrument_id=? order by date desc");
+            statement.setString(1, instrumentId);
+            ResultSet rs = statement.executeQuery();
+            List<InstrumentStatus> statuses = new ArrayList<InstrumentStatus>();
+            while(rs.next()) {
+                InstrumentStatus status = new InstrumentStatus();
+                status.setDate(rs.getTimestamp("date"));
+                status.setInstrumentId(instrumentId);
+                status.setStatusByUser(rs.getString("state_by_user"));
+                status.setText(rs.getString("state"));
+                statuses.add(status);
+            }
+            rs.close();
+
+            statement.close();
+            log.info("Get instrument statuses ok");
+            return statuses;
+        } finally {
+            connection.close();
+        }    
     }
 }

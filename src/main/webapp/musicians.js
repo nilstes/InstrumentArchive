@@ -19,17 +19,19 @@ function initTable(table) {
             for(i=0; i<data.length; i++) {
                 $("#delete" + i).click({musician: data[i]}, function(event) {
                     bootbox.confirm("Er du sikker på at du vil slette musikant " + event.data.musician.firstName + " " + event.data.musician.lastName + "?", function(result) {    
-                        $.ajax({
-                            url: 'webresources/musicians/' + event.data.musician.id,
-                            type: 'DELETE',
-                            success: function(data) {
-                                table.clear();
-                                initTable(table);
-                            },
-                            error: function() {
-                                window.location.href = "error.html";
-                            }                   
-                        });
+                        if(result) {
+                            $.ajax({
+                                url: 'webresources/musicians/' + event.data.musician.id,
+                                type: 'DELETE',
+                                success: function(data) {
+                                    table.clear();
+                                    initTable(table);
+                                },
+                                error: function() {
+                                    window.location.href = "error.html";
+                                }                   
+                            });
+                        }
                     });                  
                 });
                 $("#edit" + i).click({i: i}, function(event) {

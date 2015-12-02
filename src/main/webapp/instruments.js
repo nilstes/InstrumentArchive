@@ -4,14 +4,14 @@ function initTable(table) {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
+            table.clear();
             for(i=0; i<data.length; i++) {
-                var lastStatus = data[i].statuses.length > 0?data[i].statuses[data[i].statuses.length-1]:"";
                 table.row.add([
                     getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
                     data[i].type,
                     data[i].make,
                     data[i].lentTo,
-                    lastStatus
+                    data[i].status
                 ]);
             }
             table.draw();
@@ -20,17 +20,18 @@ function initTable(table) {
             for(i=0; i<data.length; i++) {
                 $("#delete" + i).click({instrument: data[i]}, function(event) {
                     bootbox.confirm("Er du sikker på at du vil slette instrument " + event.data.instrument.make + " " + event.data.instrument.type + "?", function(result) {    
-                        $.ajax({
-                            url: 'webresources/instruments/' + event.data.instrument.id,
-                            type: 'DELETE',
-                            success: function(data) {
-                                table.clear();
-                                initTable(table);
-                            },
-                            error: function() {
-                                window.location.href = "error.html";
-                            }                   
-                        });
+                        if(result) {
+                            $.ajax({
+                                url: 'webresources/instruments/' + event.data.instrument.id,
+                                type: 'DELETE',
+                                success: function(data) {
+                                    initTable(table);
+                                },
+                                error: function() {
+                                    window.location.href = "error.html";
+                                }                   
+                            });
+                        }
                     });                  
                 });
                 $("#edit" + i).click({id: data[i].id}, function(event) {
@@ -45,7 +46,7 @@ function initTable(table) {
 }
 
 $(document).ready(function() {
-    var t = $('#instruments').DataTable( {
+    var table = $('#instruments').DataTable( {
         "paging": true,
         "lengthChange": false,
         "info": false,
@@ -72,7 +73,7 @@ $(document).ready(function() {
     
     getLoggedOnUser(function(data) {
         $("#logout").html(data.email + ": logg ut");
-        initTable(t);
+        initTable(table);
     });
     
     $("#newInstrumentForm").submit(function(event) {
@@ -88,12 +89,12 @@ $(document).ready(function() {
                 make: $("#make").val(),
                 productNo: $("#productNo").val(),
                 serialNo: $("#serialNo").val(),
-                description: $("#description").val()
+                description: $("#description").val(),
+                status: $("#status").val()
             }),
             contentType: "application/json",
             success: function (data, textStatus, jqXHR) {
-                t.clear();
-                initTable(t);
+                initTable(table);
                 $('#newInstrumentModal').modal('hide');
             },
             error: function (jqXHR, textStatus, errorThrown) {

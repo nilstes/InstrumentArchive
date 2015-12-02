@@ -23,3 +23,14 @@ body {
 td {
     vertical-align: middle;
 }
+
+.panel-heading a.collapser:before {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: left;
+    color: grey;
+    margin-right: 10px;
+}
+.panel-heading a.collapser.collapsed:before {
+    content:"\e080";
+}

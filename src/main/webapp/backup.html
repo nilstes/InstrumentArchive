@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Backup</title>
+        <script src="js/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $("#dumpFile").val("C:\\Users\\nilstes\\Dropbox\\InstrumentArkiv\\db-" + new Date().toJSON().substring(0,10) + ".sql");
+                $("#restoreFile").val("C:\\Users\\nilstes\\Dropbox\\InstrumentArkiv\\");              
+            });
+        </script>
+    </head>
+
+    <body>
+        <form method="POST" action="webresources/backup/dump">
+            <input type="text" size="50" id="dumpFile" name="file"><input type="submit" value="Dump">
+        </form>
+        <form method="POST" action="webresources/backup/restore">
+            <input type="text" size="50" id="restoreFile" name="file"><input type="submit" value="Restore">
+        </form>
+    </body>
+</html>
