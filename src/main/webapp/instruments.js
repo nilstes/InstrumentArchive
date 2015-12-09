@@ -9,7 +9,8 @@ function initTable(table) {
                 table.row.add([
                     getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
                     data[i].type,
-                    data[i].make,
+                    data[i].make + (data[i].productNo?", " + data[i].productNo:""),
+                    data[i].serialNo,
                     data[i].lentTo,
                     data[i].status
                 ]);
@@ -19,20 +20,24 @@ function initTable(table) {
             // Register callbacks
             for(i=0; i<data.length; i++) {
                 $("#delete" + i).click({instrument: data[i]}, function(event) {
-                    bootbox.confirm("Er du sikker på at du vil slette instrument " + event.data.instrument.make + " " + event.data.instrument.type + "?", function(result) {    
-                        if(result) {
-                            $.ajax({
-                                url: 'webresources/instruments/' + event.data.instrument.id,
-                                type: 'DELETE',
-                                success: function(data) {
-                                    initTable(table);
-                                },
-                                error: function() {
-                                    window.location.href = "error.html";
-                                }                   
-                            });
-                        }
-                    });                  
+                    if(event.data.instrument.lentTo) {
+                        bootbox.alert("Instrumentet kan ikke slettes da det er utlånt!")
+                    } else {
+                        bootbox.confirm("Er du sikker på at du vil slette instrument " + event.data.instrument.make + " " + event.data.instrument.type + "?", function(result) {    
+                            if(result) {
+                                $.ajax({
+                                    url: 'webresources/instruments/' + event.data.instrument.id,
+                                    type: 'DELETE',
+                                    success: function(data) {
+                                        initTable(table);
+                                    },
+                                    error: function() {
+                                        window.location.href = "error.html";
+                                    }                   
+                                });
+                            }
+                        });                  
+                    }
                 });
                 $("#edit" + i).click({id: data[i].id}, function(event) {
                     window.location.href = "instrument.html?id=" + event.data.id;
