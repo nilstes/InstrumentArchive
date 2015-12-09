@@ -11,7 +11,7 @@ public class Musician implements Serializable {
     private String id;
     private String firstName;
     private String lastName;
-    private List<String> instruments = new ArrayList<String>();
+    private List<Instrument> instruments = new ArrayList<Instrument>();
 
     public Musician() {
     }
@@ -46,11 +46,11 @@ public class Musician implements Serializable {
         this.lastName = lastName;
     }
 
-    public List<String> getInstruments() {
+    public List<Instrument> getInstruments() {
         return instruments;
     }
 
-    public void setInstruments(List<String> instruments) {
+    public void setInstruments(List<Instrument> instruments) {
         this.instruments = instruments;
     }
 }

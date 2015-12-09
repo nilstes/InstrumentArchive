@@ -1,3 +1,22 @@
+function createInstrumentLinkList(instruments) {
+    var html = "";
+    if(instruments != null) {
+        for(j=0; j<instruments.length; j++) {
+            html += createInstrumentLink(instruments[j]);
+            if(j<instruments.length-1) {
+                html += ", ";
+            }
+        }
+    }
+    return html;
+}
+
+function createInstrumentLink(instrument) {
+    var display = instrument.make + " " + instrument.type;
+    var link = "instrument.html?id=" + instrument.id;
+    return "<a href='" + link + "'>" + display + "</a>";
+}
+
 function initTable(table) {
     $.ajax({
         url: 'webresources/musicians',
@@ -5,12 +24,11 @@ function initTable(table) {
         dataType: 'json',
         success: function(data) {
             for(i=0; i<data.length; i++) {
-                var instruments = data[i].instruments.join();
                 table.row.add([
                     getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
                     data[i].firstName,
                     data[i].lastName,
-                    instruments
+                    createInstrumentLinkList(data[i].instruments)
                 ]);
             }
             table.draw();
@@ -18,21 +36,25 @@ function initTable(table) {
             // Register callbacks
             for(i=0; i<data.length; i++) {
                 $("#delete" + i).click({musician: data[i]}, function(event) {
-                    bootbox.confirm("Er du sikker på at du vil slette musikant " + event.data.musician.firstName + " " + event.data.musician.lastName + "?", function(result) {    
-                        if(result) {
-                            $.ajax({
-                                url: 'webresources/musicians/' + event.data.musician.id,
-                                type: 'DELETE',
-                                success: function(data) {
-                                    table.clear();
-                                    initTable(table);
-                                },
-                                error: function() {
-                                    window.location.href = "error.html";
-                                }                   
-                            });
-                        }
-                    });                  
+                    if(event.data.musician.instruments && event.data.musician.instruments.length > 0) {
+                        bootbox.alert("Musikanten har instrument(er) til utlån!")
+                    } else {
+                        bootbox.confirm("Er du sikker på at du vil slette musikant " + event.data.musician.firstName + " " + event.data.musician.lastName + "?", function(result) {    
+                            if(result) {
+                                $.ajax({
+                                    url: 'webresources/musicians/' + event.data.musician.id,
+                                    type: 'DELETE',
+                                    success: function(data) {
+                                        table.clear();
+                                        initTable(table);
+                                    },
+                                    error: function() {
+                                        window.location.href = "error.html";
+                                    }                   
+                                });
+                            }
+                        });                  
+                    }
                 });
                 $("#edit" + i).click({i: i}, function(event) {
                     $('#editMusicianId').val(data[event.data.i].id);

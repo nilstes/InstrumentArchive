@@ -3,7 +3,6 @@ package services;
 import data.Instrument;
 import data.InstrumentFilter;
 import data.Musician;
-import data.InstrumentStatus;
 import db.InstrumentDao;
 import db.MusicianDao;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class ExcelService extends SecureService {
     }
 
     private void createMusiciansList(final HSSFWorkbook workbook, HSSFSheet sheet, List<Musician> musicians) {
-        List<String> instruments;
+        List<Instrument> instruments;
         createHeaders(workbook, sheet, Arrays.asList("Navn", "Instrumenter"));
         for(int i=0; i<musicians.size(); i++) {
             HSSFRow row = sheet.createRow(i+1);
@@ -143,10 +142,12 @@ public class ExcelService extends SecureService {
         return cell;
     }
 
-    private String createInstrumentListString(List<String> instruments) {
+    private String createInstrumentListString(List<Instrument> instruments) {
         StringBuilder sb = new StringBuilder();
         for(int i=0; i<instruments.size(); i++) {
-            sb.append(instruments.get(i));
+            sb.append(instruments.get(i).getMake());
+            sb.append(" ");
+            sb.append(instruments.get(i).getType());
             if(i < instruments.size() - 1) {
                 sb.append(", ");                       
             }

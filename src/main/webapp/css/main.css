@@ -29,6 +29,11 @@ td {
     vertical-align: middle;
 }
 
+.panel-heading {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
 .panel-heading a.collapser:before {
     font-family:'Glyphicons Halflings';
     content:"\e114";

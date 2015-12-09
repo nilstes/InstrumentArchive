@@ -19,6 +19,8 @@ public class MusicianDao {
 
     private static final Logger log = Logger.getLogger(MusicianDao.class.getName());
 
+    private InstrumentDao instrumentDao = new InstrumentDao();
+    
     public List<Musician> getMusicians() throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
@@ -110,12 +112,12 @@ public class MusicianDao {
     }
 
     private void getInstruments(Connection connection, List<Musician> musicians) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT name,make FROM instrument_type it inner join instrument i on it.id=i.type inner join musician_instrument mi on mi.instrument_id=i.id where musician_id=? and out_at is not null and in_at is null");
+        PreparedStatement statement = connection.prepareStatement("SELECT i.*,it.name FROM instrument i inner join instrument_type it on it.id=i.type inner join musician_instrument mi on mi.instrument_id=i.id where musician_id=? and out_at is not null and in_at is null");
         for(Musician musician : musicians) {
             statement.setString(1, musician.getId());
             ResultSet rs = statement.executeQuery();
             while(rs.next()) {
-                musician.getInstruments().add(rs.getString("make") + " " + rs.getString("name"));
+                musician.getInstruments().add(instrumentDao.getOneInstrument(rs));
             }
             rs.close();
         }

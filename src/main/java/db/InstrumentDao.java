@@ -179,7 +179,7 @@ public class InstrumentDao {
         log.info("getInstrument(" + id + ")");
         Connection connection = Db.instance().getConnection();
         try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM instrument i inner join instrument_type it on i.type=it.id where i.id=?");
+            PreparedStatement statement = connection.prepareStatement("SELECT i.*,it.name FROM instrument i inner join instrument_type it on i.type=it.id where i.id=?");
             statement.setString(1, id);
             log.fine(statement.toString());
             ResultSet rs = statement.executeQuery();
@@ -245,7 +245,7 @@ public class InstrumentDao {
         }        
     }
 
-    private Instrument getOneInstrument(ResultSet rs) throws SQLException {
+    Instrument getOneInstrument(ResultSet rs) throws SQLException {
         Instrument i = new Instrument();
         i.setId(rs.getString("id"));
         i.setDescription(rs.getString("description"));
