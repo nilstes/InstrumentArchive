@@ -23,7 +23,8 @@ function initTable(table) {
                     if(event.data.instrument.lentTo) {
                         bootbox.alert("Instrumentet kan ikke slettes da det er utlånt!")
                     } else {
-                        bootbox.confirm("Er du sikker på at du vil slette instrument " + event.data.instrument.make + " " + event.data.instrument.type + "?", function(result) {    
+                        bootbox.confirm("Er du sikker på at du vil slette " + event.data.instrument.type + ", " + event.data.instrument.make + ", "
+                                + event.data.instrument.productNo + " med serienr " + event.data.instrument.serialNo + "?", function(result) {    
                             if(result) {
                                 $.ajax({
                                     url: 'webresources/instruments/' + event.data.instrument.id,
