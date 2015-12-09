@@ -1,0 +1,41 @@
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.logo, h1.logo {
+    margin: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: Georgia, Times, 'Times New Roman', serif;
+    color: darkblue;
+}
+
+.static-form-group {
+    float: left;
+    margin-right: 25px;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.table>tbody>tr>td {
+    padding: 4px;
+    vertical-align: middle;
+}
+
+.panel-heading a.collapser:before {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: left;
+    color: grey;
+    margin-right: 10px;
+}
+.panel-heading a.collapser.collapsed:before {
+    content:"\e080";
+}
