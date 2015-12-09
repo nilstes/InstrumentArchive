@@ -24,7 +24,7 @@ public class Db {
             Connection connection = getConnection();
             try {
                 Statement statement = connection.createStatement();
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS user ( email VARCHAR(256) PRIMARY KEY, password VARCHAR(256) )");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS user ( email VARCHAR(256) PRIMARY KEY, salt VARCHAR(256) NOT NULL, password VARBINARY(256) NOT NULL)");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument ( id VARCHAR(256) PRIMARY KEY, type VARCHAR(256), make VARCHAR(256), serial VARCHAR(256), product_no VARCHAR(256), description VARCHAR(256) )");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS musician ( id VARCHAR(256) PRIMARY KEY, first_name VARCHAR(256), last_name VARCHAR(256) )");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS instrument_type ( id VARCHAR(256) PRIMARY KEY, name VARCHAR(256) )");

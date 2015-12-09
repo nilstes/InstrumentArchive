@@ -44,7 +44,7 @@ public class UserService extends SecureService  {
         try {
             userDao.updateUser(user);
             log.info("Updated user!");        
-        } catch(SQLException e) {
+        } catch(Exception e) {
             log.log(Level.SEVERE, "Failed to update user", e);        
             throw new ServerErrorException("Failed to update user", Response.Status.INTERNAL_SERVER_ERROR, e);
         }
@@ -73,7 +73,7 @@ public class UserService extends SecureService  {
         try {
             userDao.addUser(user);
             log.info("Added user!");        
-        } catch(SQLException e) {
+        } catch(Exception e) {
             log.log(Level.SEVERE, "Failed to add user", e);        
             throw new ServerErrorException("Failed to add user", Response.Status.INTERNAL_SERVER_ERROR, e);
         }

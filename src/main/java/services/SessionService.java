@@ -49,10 +49,10 @@ public class SessionService {
                 user = userDao.insertFirstUserIfEmpty(new User(data.getEmail(), data.getPassword()));
             }
             // Check that password is correct.
-            if(user == null || !data.getPassword().equals(user.getPassword())) {
+            if(user == null || !userDao.isPasswordOk(data.getEmail(), data.getPassword())) {
                 throw new NotAuthorizedException("Feil brukernavn eller passord");
             }
-        } catch(SQLException e) {
+        } catch(Exception e) {
             log.log(Level.SEVERE, "Failed to check user", e);        
             throw new ServerErrorException("DB error", Response.Status.INTERNAL_SERVER_ERROR, e);
         }

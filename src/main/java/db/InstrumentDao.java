@@ -163,6 +163,12 @@ public class InstrumentDao {
             s.executeUpdate();
             s.close();
 
+            s = connection.prepareStatement("DELETE FROM musician_instrument where instrument_id=?");
+            s.setString(1, id);
+            log.fine(s.toString());
+            s.executeUpdate();
+            s.close();
+
             log.info("Delete instrument " + (result == 1?"ok":"failed"));
         } finally {
             connection.close();
