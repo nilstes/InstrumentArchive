@@ -54,8 +54,8 @@ function initTable(table) {
 $(document).ready(function() {
     var table = $('#instruments').DataTable( {
         "paging": true,
-        "lengthChange": false,
-        "info": false,
+        "lengthChange": true,
+        "info": true,
         "searching": true,
         "order": [[ 1, "asc" ]]
     });
