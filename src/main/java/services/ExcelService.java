@@ -8,6 +8,8 @@ import db.MusicianDao;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,7 +37,8 @@ import org.apache.poi.ss.usermodel.CellStyle;
 public class ExcelService extends SecureService {
 
     private static final Logger log = Logger.getLogger(InstrumentService.class.getName());
-
+    private static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy"); 
+    
     private InstrumentDao instrumentDao = new InstrumentDao();
     private MusicianDao musicianDao = new MusicianDao();
 
@@ -94,6 +97,7 @@ public class ExcelService extends SecureService {
         for(int i=0; i<instruments.size(); i++) {
             HSSFRow row = sheet.createRow(i+1);
             String lentTo = instruments.get(i).getLentTo();
+            String statusDate = instruments.get(i).getStatusDate()==null?"":dateFormat.format(instruments.get(i).getStatusDate());
             createTextCell(row, instruments.get(i).getType(), 0);
             createTextCell(row, instruments.get(i).getMake(), 1);
             createTextCell(row, instruments.get(i).getProductNo(), 2);
@@ -101,7 +105,7 @@ public class ExcelService extends SecureService {
             createTextCell(row, instruments.get(i).getDescription(), 4);
             createTextCell(row, lentTo==null?"":lentTo, 5);
             createTextCell(row, instruments.get(i).getStatus(), 6);
-            createTextCell(row, instruments.get(i).getStatusDate().toString(), 7);
+            createTextCell(row, statusDate, 7);
         }
         sheet.autoSizeColumn(0);
         sheet.autoSizeColumn(1);
