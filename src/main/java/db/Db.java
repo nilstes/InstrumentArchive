@@ -54,6 +54,8 @@ public class Db {
                 statement.executeUpdate("MERGE INTO instrument_type values ('21', 'Trombone (Tenor)')");
                 statement.executeUpdate("MERGE INTO instrument_type values ('22', 'Perkusjon (Rytmisk)')");
                 statement.executeUpdate("MERGE INTO instrument_type values ('23', 'Perkusjon (Melodisk)')");
+                statement.executeUpdate("MERGE INTO instrument_type values ('24', 'Saksofon (Baryton)')");
+                statement.executeUpdate("MERGE INTO instrument_type values ('25', 'Susafon')");
 
                 statement.close();
             } finally {
