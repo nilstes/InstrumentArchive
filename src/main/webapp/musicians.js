@@ -35,7 +35,7 @@ function initTable(table) {
 
             // Register callbacks
             for(i=0; i<data.length; i++) {
-                $("#delete" + i).click({musician: data[i]}, function(event) {
+                $(document).on("click", ("#delete" + i), {musician: data[i]}, function(event) {
                     if(event.data.musician.instruments && event.data.musician.instruments.length > 0) {
                         bootbox.alert("Musikanten har instrument(er) til utlån!")
                     } else {
@@ -56,7 +56,7 @@ function initTable(table) {
                         });                  
                     }
                 });
-                $("#edit" + i).click({i: i}, function(event) {
+                $(document).on("click", ("#edit" + i), {i: i}, function(event) {
                     $('#editMusicianId').val(data[event.data.i].id);
                     $('#editMusicianFirstName').val(data[event.data.i].firstName);
                     $('#editMusicianLastName').val(data[event.data.i].lastName);

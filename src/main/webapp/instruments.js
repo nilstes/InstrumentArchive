@@ -19,7 +19,7 @@ function initTable(table) {
             
             // Register callbacks
             for(i=0; i<data.length; i++) {
-                $("#delete" + i).click({instrument: data[i]}, function(event) {
+                $(document).on("click", ("#delete" + i), {instrument: data[i]}, function(event) {
                     if(event.data.instrument.lentTo) {
                         bootbox.alert("Instrumentet kan ikke slettes da det er utlånt!")
                     } else {
@@ -40,7 +40,7 @@ function initTable(table) {
                         });                  
                     }
                 });
-                $("#edit" + i).click({id: data[i].id}, function(event) {
+                $(document).on("click", ("#edit" + i), {id: data[i].id}, function(event) {
                     window.location.href = "instrument.html?id=" + event.data.id;
                 });
             }

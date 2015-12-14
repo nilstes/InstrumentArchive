@@ -16,7 +16,7 @@ function initTable(table) {
 
             // Register callbacks
             for(i=0; i<data.length; i++) {
-                $("#delete" + i).click({email: data[i].email}, function(event) {
+                $(document).on("click", ("#delete" + i), {email: data[i].email}, function(event) {
                     bootbox.confirm("Er du sikker på at du vil slette bruker " + event.data.email + "?", function(result) {    
                         if(result) {
                             $.ajax({
@@ -33,7 +33,7 @@ function initTable(table) {
                         }
                     });                  
                 });
-                $("#edit" + i).click({i: i}, function(event) {
+                $(document).on("click", ("#edit" + i), {i: i}, function(event) {
                     $('#editUserEmail').val(data[event.data.i].email);
                     $('#editUserPwd').val(data[event.data.i].password);
                     $('#editUserModal').modal('show');           
