@@ -52,7 +52,7 @@ public class SessionService {
             if(user == null || !userDao.isPasswordOk(data.getEmail(), data.getPassword())) {
                 throw new NotAuthorizedException("Feil brukernavn eller passord");
             }
-        } catch(Exception e) {
+        } catch(SQLException e) {
             log.log(Level.SEVERE, "Failed to check user", e);        
             throw new ServerErrorException("DB error", Response.Status.INTERNAL_SERVER_ERROR, e);
         }

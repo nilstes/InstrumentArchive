@@ -28,10 +28,15 @@ public class UserDao {
         return new BigInteger(128, random).toString(36);
     }
     
-    byte[] makeHash(String salt, String password) throws NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-        messageDigest.update((salt + password).getBytes());
-        return messageDigest.digest();
+    byte[] makeHash(String salt, String password) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.update((salt + password).getBytes());
+            return messageDigest.digest();
+        } catch(NoSuchAlgorithmException e) {
+            log.severe(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
     
     public User getUser(String email) throws SQLException {
@@ -58,7 +63,7 @@ public class UserDao {
         }
     }
 
-    public boolean isPasswordOk(String email, String password) throws SQLException, NoSuchAlgorithmException {
+    public boolean isPasswordOk(String email, String password) throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
             PreparedStatement statement = connection.prepareStatement("SELECT salt,password FROM user WHERE email=?");
@@ -95,7 +100,7 @@ public class UserDao {
         }        
     }
 
-    private boolean doAddUser(Connection connection, User user) throws SQLException, NoSuchAlgorithmException {
+    private boolean doAddUser(Connection connection, User user) throws SQLException {
         PreparedStatement s = connection.prepareStatement("INSERT INTO user (email,salt,password) VALUES(?,?,?)");
         String salt = generateSalt();
         s.setString(1, user.getEmail());
@@ -141,7 +146,7 @@ public class UserDao {
         }        
     }
 
-    public User insertFirstUserIfEmpty(User user) throws SQLException, NoSuchAlgorithmException {
+    public User insertFirstUserIfEmpty(User user) throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
             PreparedStatement s = connection.prepareStatement("SELECT COUNT(*) from user");
