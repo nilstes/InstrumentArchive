@@ -18,7 +18,7 @@ public class Db {
     
     private Db() {
         try {
-            dbUrl = System.getProperty("db.url", "jdbc:h2:~/instruments?user=instruments");
+            dbUrl = System.getProperty("db.url", "jdbc:h2:~/instruments;USER=instruments");
             String driver = "org.h2.Driver";
             if(dbUrl.contains("mysql")) {
                 driver = "com.mysql.jdbc.Driver";
@@ -38,6 +38,6 @@ public class Db {
     Connection getConnection() throws SQLException {
         // todo FIXME This is not a good way to get connections
         // Use a pool instead
-        return DriverManager.getConnection("db.url");
+        return DriverManager.getConnection(dbUrl);
     }
 }
