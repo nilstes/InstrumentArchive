@@ -17,8 +17,8 @@ $(document).ready(function() {
             }),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            complete: function(jqXHR, textStatus) {
-                switch (jqXHR.status) {
+            complete: function(xhr) {
+                switch (xhr.status) {
                     case 200:
                         document.cookie = "testcookie=sensitive data";
                         window.location.href="instruments.html";
@@ -27,7 +27,7 @@ $(document).ready(function() {
                         $("#wrongPasswordAlert").removeClass("hide");
                         break;
                     default:
-                        window.location.href="error.html";
+                        window.location.href = "loggedout.html";
                         break;
                 }
             }

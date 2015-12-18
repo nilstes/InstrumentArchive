@@ -1,85 +1,98 @@
-function initTable(table) {
-    $.ajax({
-        url: 'webresources/instruments',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            table.clear();
-            for(i=0; i<data.length; i++) {
-                table.row.add([
-                    getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
-                    data[i].type,
-                    data[i].make + (data[i].productNo?", " + data[i].productNo:""),
-                    data[i].serialNo,
-                    data[i].lentTo,
-                    data[i].status
-                ]);
-            }
-            table.draw();
-            
-            // Register callbacks
-            for(i=0; i<data.length; i++) {
-                $(document).on("click", ("#delete" + i), {instrument: data[i]}, function(event) {
-                    if(event.data.instrument.lentTo) {
-                        bootbox.alert("Instrumentet kan ikke slettes da det er utlånt!")
-                    } else {
-                        bootbox.confirm("Er du sikker på at du vil slette " + event.data.instrument.type + ", " + event.data.instrument.make + ", "
-                                + event.data.instrument.productNo + " med serienr " + event.data.instrument.serialNo + "?", function(result) {    
-                            if(result) {
-                                $.ajax({
-                                    url: 'webresources/instruments/' + event.data.instrument.id,
-                                    type: 'DELETE',
-                                    success: function(data) {
-                                        initTable(table);
-                                    },
-                                    error: function() {
-                                        window.location.href = "error.html";
-                                    }                   
-                                });
-                            }
-                        });                  
-                    }
-                });
-                $(document).on("click", ("#edit" + i), {id: data[i].id}, function(event) {
-                    window.location.href = "instrument.html?id=" + event.data.id;
+function deleteInstrument(instrument) {
+    if(instrument.lentTo) {
+        bootbox.alert("Instrumentet kan ikke slettes da det er utlånt!")
+    } else {
+        bootbox.confirm("Er du sikker på at du vil slette " + instrument.type + ", " + instrument.make + ", "
+                + instrument.productNo + " med serienr " + instrument.serialNo + "?", function(result) {    
+            if(result) {
+                $.ajax({
+                    url: 'webresources/instruments/' + instrument.id,
+                    type: 'DELETE',
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        handleError(xhr, status, error);
+                    }                   
                 });
             }
-        },
-        error: function() {
-            window.location.href = "error.html";
-        }
-    });
+        });                  
+    }    
+}
+
+function initTable(table, data) {
+    table.clear();
+    for(i=0; i<data.length; i++) {
+        table.row.add([
+            getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
+            data[i].type,
+            data[i].make + (data[i].productNo?", " + data[i].productNo:""),
+            data[i].serialNo,
+            data[i].lentTo,
+            data[i].status
+        ]);
+    }
+    table.draw();
+
+    // Register callbacks
+    for(i=0; i<data.length; i++) {
+        $(document).on("click", ("#delete" + i), {instrument: data[i]}, function(event) {
+            deleteInstrument(event.data.instrument);
+        });
+        $(document).on("click", ("#edit" + i), {id: data[i].id}, function(event) {
+            window.location.href = "instrument.html?id=" + event.data.id;
+        });
+    }       
 }
 
 $(document).ready(function() {
-    var table = $('#instruments').DataTable( {
-        "paging": true,
-        "lengthChange": true,
-        "info": true,
-        "searching": true,
-        "order": [[ 1, "asc" ]]
-    });
-    
-    $.getJSON('webresources/instruments/types', function(data) {
-        $.each(data, function(key, value) {   
-            $('#type')
-                .append($("<option></option>")
-                .attr("value", value.id)
-                .text(value.name)); 
-        });        
-    });
-    
-    $.getJSON('webresources/instruments/makes', function(data) {
-        $.each(data, function(key, value) {   
-            $('#makes')
-                .append($("<option></option>")
-                .attr("value", value)); 
-        });        
-    });
-    
+    var table;
+
     getLoggedOnUser(function(data) {
         $("#logout").html(data.email + ": logg ut");
-        initTable(table);
+
+        $.when(
+            $.ajax({
+                url: 'webresources/instruments',
+                type: 'GET',
+                dataType: 'json'
+            }),  
+            $.ajax({
+                url: 'webresources/instruments/types',
+                type: 'GET',
+                dataType: 'json'               
+            }),             
+            $.ajax({
+                url: 'webresources/instruments/makes',
+                type: 'GET',
+                dataType: 'json'               
+            })
+        ).then(function(instruments, types, makes) {
+            table = $('#instruments').DataTable( {
+                "paging": true,
+                "lengthChange": true,
+                "info": true,
+                "searching": true,
+                "order": [[ 1, "asc" ]]
+            });
+            
+            initTable(table, instruments[0]);
+            
+            $.each(makes[0], function(key, value) {   
+                $('#makes')
+                    .append($("<option></option>")
+                    .attr("value", value)); 
+            });       
+            
+            $.each(types[0], function(key, value) {   
+                $('#type')
+                    .append($("<option></option>")
+                    .attr("value", value.id)
+                    .text(value.name)); 
+            });                       
+        }, function(xhr, status, error) {
+            handleError(xhr, status, error);
+        });
     });
     
     $("#newInstrumentForm").submit(function(event) {
@@ -99,12 +112,12 @@ $(document).ready(function() {
                 status: $("#status").val()
             }),
             contentType: "application/json",
-            success: function (data, textStatus, jqXHR) {
-                initTable(table);
+            success: function () {
                 $('#newInstrumentModal').modal('hide');
+                location.reload();
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function (xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });

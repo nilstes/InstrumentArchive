@@ -1,6 +1,6 @@
 function createInstrumentLinkList(instruments) {
     var html = "";
-    if(instruments != null) {
+    if(instruments) {
         for(j=0; j<instruments.length; j++) {
             html += createInstrumentLink(instruments[j]);
             if(j<instruments.length-1) {
@@ -17,71 +17,77 @@ function createInstrumentLink(instrument) {
     return "<a href='" + link + "'>" + display + "</a>";
 }
 
-function initTable(table) {
-    $.ajax({
-        url: 'webresources/musicians',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            for(i=0; i<data.length; i++) {
-                table.row.add([
-                    getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
-                    data[i].firstName,
-                    data[i].lastName,
-                    createInstrumentLinkList(data[i].instruments)
-                ]);
-            }
-            table.draw();
-
-            // Register callbacks
-            for(i=0; i<data.length; i++) {
-                $(document).on("click", ("#delete" + i), {musician: data[i]}, function(event) {
-                    if(event.data.musician.instruments && event.data.musician.instruments.length > 0) {
-                        bootbox.alert("Musikanten har instrument(er) til utlån!")
-                    } else {
-                        bootbox.confirm("Er du sikker på at du vil slette musikant " + event.data.musician.firstName + " " + event.data.musician.lastName + "?", function(result) {    
-                            if(result) {
-                                $.ajax({
-                                    url: 'webresources/musicians/' + event.data.musician.id,
-                                    type: 'DELETE',
-                                    success: function(data) {
-                                        table.clear();
-                                        initTable(table);
-                                    },
-                                    error: function() {
-                                        window.location.href = "error.html";
-                                    }                   
-                                });
-                            }
-                        });                  
+function deleteMusician(musician) {
+    if(musician.instruments && musician.instruments.length > 0) {
+        bootbox.alert("Musikanten har instrument(er) til utlån!")
+    } else {
+        bootbox.confirm("Er du sikker på at du vil slette musikant " + musician.firstName + " " + musician.lastName + "?", function(result) {    
+            if(result) {                     
+                $.ajax({
+                    url: 'webresources/musicians/' + musician.id,
+                    type: 'DELETE',
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        handleError(xhr, status, error);
                     }
-                });
-                $(document).on("click", ("#edit" + i), {i: i}, function(event) {
-                    $('#editMusicianId').val(data[event.data.i].id);
-                    $('#editMusicianFirstName').val(data[event.data.i].firstName);
-                    $('#editMusicianLastName').val(data[event.data.i].lastName);
-                    $('#editMusicianModal').modal('show');           
-                });
+               });
             }
-        },
-        error: function() {
-            window.location.href = "error.html";
-        }
-    });
+        });                  
+    }    
+}
+
+function initTable(table, data) {
+    for(i=0; i<data.length; i++) {
+        table.row.add([
+            getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
+            data[i].firstName,
+            data[i].lastName,
+            createInstrumentLinkList(data[i].instruments)
+        ]);
+    }
+    table.draw();
+
+    // Register callbacks
+    for(i=0; i<data.length; i++) {
+        $(document).on("click", ("#delete" + i), {musician: data[i]}, function(event) {
+            deleteMusician(event.data.musician);
+        });
+        $(document).on("click", ("#edit" + i), {i: i}, function(event) {
+            $('#editMusicianId').val(data[event.data.i].id);
+            $('#editMusicianFirstName').val(data[event.data.i].firstName);
+            $('#editMusicianLastName').val(data[event.data.i].lastName);
+            $('#editMusicianModal').modal('show');           
+        });
+    }
 }
 
 $(document).ready(function() {
-    var t = $('#musicians').DataTable( {
-        "paging": true,
-        "lengthChange": false,
-        "info": false,
-        "searching": true,
-        "order": [[ 2, "asc" ]]
-    });
+    var table;
             
     getLoggedOnUser(function(data) {
-        $("#logout").html(data.email + ": logg ut");
-        initTable(t);
+        $.ajax({
+            url: 'webresources/musicians',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                $("#logout").html(data.email + ": logg ut");
+                
+                table = $('#musicians').DataTable( {
+                    "paging": true,
+                    "lengthChange": false,
+                    "info": false,
+                    "searching": true,
+                    "order": [[ 2, "asc" ]]
+                });
+
+                initTable(table, data);
+            },
+            error: function (xhr, status, error) {
+                handleError(xhr, status, error);
+            }
+        });
     });
     
     $("#newMusicianForm").submit(function(event) {
@@ -97,13 +103,12 @@ $(document).ready(function() {
                 lastName: $("#newMusicianLastName").val()
             }),
             contentType: "application/json",
-            success: function (data, textStatus, jqXHR) {
-                t.clear();
-                initTable(t);
+            success: function () {
                 $('#newMusicianModal').modal('hide');
+                location.reload();
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function (xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });
@@ -122,13 +127,12 @@ $(document).ready(function() {
                 lastName: $("#editMusicianLastName").val()
             }),
             contentType: "application/json",
-            success: function (data, textStatus, jqXHR) {
-                t.clear();
-                initTable(t);
+            success: function () {
                 $('#editMusicianModal').modal('hide');
+                location.reload();
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function (xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });

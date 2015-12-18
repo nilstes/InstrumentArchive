@@ -1,82 +1,112 @@
-function init(id, loansTable, statusesTable) {
-    $.getJSON('webresources/instruments/' + id + '/loans', function(data) {
+function init(id, loansTable, statusesTable) {  
+    $.when(
+        $.ajax({
+            url: 'webresources/instruments/' + id + '/statuses',
+            type: 'GET',
+            dataType: 'json'
+        }),  
+        $.ajax({
+            url: 'webresources/instruments/' + id + '/loans',
+            type: 'GET',
+            dataType: 'json'
+        }),  
+        $.ajax({
+            url: 'webresources/instruments/types',
+            type: 'GET',
+            dataType: 'json'               
+        }),             
+        $.ajax({
+            url: 'webresources/instruments/makes',
+            type: 'GET',
+            dataType: 'json'               
+        }),
+        $.ajax({
+            url: 'webresources/musicians',
+            type: 'GET',
+            dataType: 'json'               
+        }),
+        $.ajax({
+            url: 'webresources/instruments/' + id,
+            type: 'GET',
+            dataType: 'json'               
+        })
+    ).then(function(statuses, loans, types, makes, musicians, instrument) {
+        // Init loans
         loansTable.clear();
-        for(i=0; i<data.length; i++) {
+        for(i=0; i<loans[0].length; i++) {
            loansTable.row.add([
-                data[i].musicianName,
-                data[i].outAt==null?"":new Date(data[i].outAt).toLocaleDateString(),
-                data[i].outByUser,
-                data[i].inAt==null?"":new Date(data[i].inAt).toLocaleDateString(),
-                data[i].inByUser
+                loans[0][i].musicianName,
+                loans[0][i].outAt==null?"":new Date(loans[0][i].outAt).toLocaleDateString(),
+                loans[0][i].outByUser,
+                loans[0][i].inAt==null?"":new Date(loans[0][i].inAt).toLocaleDateString(),
+                loans[0][i].inByUser
             ]);
         }
         loansTable.draw();       
-    });
     
-    $.getJSON('webresources/instruments/' + id + '/statuses', function(data) {
+        // Init statuses
         statusesTable.clear();
-        for(i=0; i<data.length; i++) {
+        for(i=0; i<statuses[0].length; i++) {
            statusesTable.row.add([
-                data[i].text,
-                data[i].date==null?"":new Date(data[i].date).toLocaleDateString(),
-                data[i].statusByUser
+                statuses[0][i].text,
+                statuses[0][i].date==null?"":new Date(statuses[0][i].date).toLocaleDateString(),
+                statuses[0][i].statusByUser
             ]);
         }
         statusesTable.draw();       
-    });
     
-    $('#type').empty();
-    $.getJSON('webresources/instruments/types', function(data) {
-        $.each(data, function(key, value) {   
+        // Init types dropdown
+        $('#type').empty();
+        $.each(types[0], function(key, value) {   
             $('#type')
                 .append($("<option></option>")
                 .attr("value", value.id)
                 .text(value.name)); 
         });        
-    });
     
-    $('#makes').empty();
-    $.getJSON('webresources/instruments/makes', function(data) {
-        $.each(data, function(key, value) {   
+        // Init makes dropdown
+        $('#makes').empty();
+        $.each(makes[0], function(key, value) {   
             $('#makes')
                 .append($("<option></option>")
                 .attr("value", value)); 
         });        
-    });
 
-    $('#musician').empty();
-    $.getJSON('webresources/musicians', function(data) {
-        $.each(data, function(key, value) {   
+        // Init musicians dropdown
+        $('#musician').empty();
+        $.each(musicians[0], function(key, value) {   
             $('#musician')
                 .append($("<option></option>")
                 .attr("value", value.id)
                 .text(value.firstName + " " + value.lastName)); 
         });        
-    });
-    
-    $.getJSON('webresources/instruments/' + id, function(data) {
-        $('#staticType').html(data.type);
-        $('#staticMake').html(data.make);
-        $('#staticProductNo').html(data.productNo);
-        $('#staticSerialNo').html(data.serialNo);
-        $('#staticDescription').html(data.description);
-        $('#type').select(data.type);
-        $('#make').val(data.make);
-        $('#productNo').val(data.productNo);
-        $('#serialNo').val(data.serialNo);
-        $('#description').val(data.description);
-        $('#lentTo').html(data.lentTo);   
-        $('#lastStatus').html(data.status);
+
+        // Init instrument details
+        $('#staticType').html(instrument[0].type);
+        $('#staticMake').html(instrument[0].make);
+        $('#staticProductNo').html(instrument[0].productNo);
+        $('#staticSerialNo').html(instrument[0].serialNo);
+        $('#staticDescription').html(instrument[0].description);
+        $('#type').select(instrument[0].type);
+        $('#make').val(instrument[0].make);
+        $('#productNo').val(instrument[0].productNo);
+        $('#serialNo').val(instrument[0].serialNo);
+        $('#description').val(instrument[0].description);
+        $('#lentTo').html(instrument[0].lentTo);   
+        $('#lastStatus').html(instrument[0].status);
         
-        if(data.lentTo == null || data.lentTo == "") {
+        // Show/hide new loan/end loan-buttons
+        if(instrument[0].lentTo == null || instrument[0].lentTo == "") {
             $("#endLoan").hide();
             $("#newLoan").show();
         } else {            
             $("#newLoan").hide();
             $("#endLoan").show();
         }
+    }, function(xhr, status, error) {
+        handleError(xhr, status, error);
     });
-}
+}  
     
 $(document).ready(function() {
     
@@ -97,12 +127,10 @@ $(document).ready(function() {
         "searching": false,
         "order": [[ 1, "desc" ]]
     });
-
-    
-    init(id, loansTable, statusesTable);
-    
+   
     getLoggedOnUser(function(data) {
         $("#logout").html(data.email + ": logg ut");
+        init(id, loansTable, statusesTable);
     });
     
     $("#editInstrumentForm").submit(function(event) {
@@ -122,12 +150,12 @@ $(document).ready(function() {
                 description: $("#description").val()
             }),
             contentType: "application/json",
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 init(id, loansTable, statusesTable);
                 $('#editInstrumentModal').modal('hide');
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function(xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });
@@ -142,12 +170,12 @@ $(document).ready(function() {
             url: "webresources/instruments/" + id + "/statuses",
             data: $("#status").val(),
             contentType: "text/plain",
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 init(id, loansTable, statusesTable);
                 $('#newStatusModal').modal('hide');
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function(xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });
@@ -162,12 +190,12 @@ $(document).ready(function() {
             url: "webresources/instruments/" + id + "/loans",
             data: $("#musician").val(),
             contentType: "text/plain",
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 init(id, loansTable, statusesTable);
                 $('#newLoanModal').modal('hide');
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                window.location.href = "error.html";
+            error: function(xhr, status, error) {
+                handleError(xhr, status, error);
             }
         });    
     });
@@ -178,12 +206,12 @@ $(document).ready(function() {
                 $.ajax({
                     url: 'webresources/instruments/' + id + '/loans',
                     type: 'DELETE',
-                    success: function(data) {
+                    success: function() {
                         init(id, loansTable, statusesTable);
                     },
-                    error: function() {
-                        window.location.href = "error.html";
-                    }                   
+                    error: function(xhr, status, error) {
+                        handleError(xhr, status, error);
+                    }
                 });
             }
         });                  
