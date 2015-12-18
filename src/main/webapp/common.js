@@ -11,14 +11,18 @@ function getLoggedOnUser(success) {
                 success: function(user) {   
                     success(user);
                 },
-                error: function() {
-                    window.location.href = "error.html";
-                }
+                error: function (xhr, status, error) {
+                    handleError(xhr, status, error);
+                }                   
             }); 
         },
-        error: function() {
-            window.location.href = "error.html";
-        }
+        error: function (xhr, status, error) {
+            if(xhr.status === 404) { // No session
+                window.location.href = "loggedout.html";
+            } else {
+                handleError(xhr, status, error);
+            }
+        }                   
     });
 };
 
@@ -41,4 +45,12 @@ function getEditIcon(id) {
 
 function getGlyphIcon(icon, id) {
     return "<div class='btn-group'><button id='" + id + "' type='button' class='btn btn-default btn-sm' aria-label='Left Align'><span class='" + icon + "' aria-hidden='true'></span></button></div>";
+}
+
+function handleError(xhr, status, error) {
+    if(xhr.status === 401) {
+        window.location.href = "loggedout.html";
+    } else {
+        window.location.href = "error.html?status=" + xhr.status;
+    }
 }
