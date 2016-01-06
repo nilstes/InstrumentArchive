@@ -24,7 +24,7 @@ public class MusicianDao {
     public List<Musician> getMusicians() throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM musician");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM musician order by first_name, last_name");
             log.fine(statement.toString());
             ResultSet rs = statement.executeQuery();
             List<Musician> musicians = new ArrayList<Musician>();

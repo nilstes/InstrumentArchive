@@ -63,6 +63,10 @@ public class InstrumentService extends SecureService {
                 instrumentDao.addInstrumentState(status);
                 log.info("Added initial instrument status");        
             }
+            if(instrument.getLentTo() != null && instrument.getLentTo().length() > 0) {
+                instrumentDao.addLoan(instrument.getId(), instrument.getLentTo(), loggedOnUser);
+                log.info("Added initial instrument loan");        
+            }
         } catch(SQLException e) {
             log.log(Level.SEVERE, "Failed to add instrument", e);        
             throw new ServerErrorException("Failed to add transaction", Response.Status.INTERNAL_SERVER_ERROR, e);

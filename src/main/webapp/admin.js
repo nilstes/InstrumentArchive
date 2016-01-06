@@ -41,14 +41,14 @@ function initTable(table, data) {
 $(document).ready(function() {
     var table;
                         
-    getLoggedOnUser(function() {
+    getLoggedOnUser(function(data) {
+        $("#logout").html(data.email + ": logg ut");
+
         $.ajax({
             url: 'webresources/users',
             type: 'GET',
             dataType: 'json',
             success: function(data) {        
-                $("#logout").html(data.email + ": logg ut");
-
                 table = $('#users').DataTable( {
                     "paging": false,
                     "lengthChange": false,

@@ -67,16 +67,16 @@ $(document).ready(function() {
     var table;
             
     getLoggedOnUser(function(data) {
+        $("#logout").html(data.email + ": logg ut");
+
         $.ajax({
             url: 'webresources/musicians',
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                $("#logout").html(data.email + ": logg ut");
-                
                 table = $('#musicians').DataTable( {
                     "paging": true,
-                    "lengthChange": false,
+                    "lengthChange": true,
                     "info": false,
                     "searching": true,
                     "order": [[ 2, "asc" ]]

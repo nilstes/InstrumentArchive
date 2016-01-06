@@ -85,29 +85,35 @@
                         <div class="modal-body">
                             <form role="form" id="newInstrumentForm">
                                 <div class="form-group">
-                                  <label for="type">Type:</label>
-                                  <select class="form-control" id="type"></select>
+                                    <label for="type">Type:</label>
+                                    <select class="form-control" id="type"></select>
                                 </div>
                                 <div class="form-group">
-                                  <label for="make">Fabrikant:</label>
-                                  <input type="text" list="makes" class="form-control" id="make" placeholder="Skriv inn fabrikant">
-                                  <datalist id="makes"></datalist>
+                                    <label for="make">Fabrikant:</label>
+                                    <input type="text" list="makes" class="form-control" id="make" placeholder="Skriv inn fabrikant">
+                                    <datalist id="makes"></datalist>
                                 </div>
                                 <div class="form-group">
-                                  <label for="productNo">Produktnummer:</label>
-                                  <input type="text" class="form-control" id="productNo" placeholder="Skriv inn produktnummer">
+                                    <label for="productNo">Produktnummer:</label>
+                                    <input type="text" class="form-control" id="productNo" placeholder="Skriv inn produktnummer">
                                 </div>
                                 <div class="form-group">
-                                  <label for="serialNo">Serienummer:</label>
-                                  <input type="text" class="form-control" id="serialNo" placeholder="Skriv inn serienummer">
+                                    <label for="serialNo">Serienummer:</label>
+                                    <input type="text" class="form-control" id="serialNo" placeholder="Skriv inn serienummer">
                                 </div>
                                 <div class="form-group">
-                                  <label for="description">Beskrivelse:</label>
-                                  <input type="text" class="form-control" id="description" placeholder="Skriv inn eventuell tilleggsinformasjon">
+                                    <label for="description">Beskrivelse:</label>
+                                    <input type="text" class="form-control" id="description" placeholder="Skriv inn eventuell tilleggsinformasjon">
                                 </div>
                                 <div class="form-group">
-                                  <label for="status">Status:</label>
-                                  <input type="text" class="form-control" id="status" placeholder="Skriv inn status">
+                                    <label for="status">Status:</label>
+                                    <input type="text" class="form-control" id="status" placeholder="Skriv inn status">
+                                </div>                                
+                                <div class="form-group">
+                                    <label for="lentTo">Utlån:</label>
+                                    <select class="form-control" id="lentTo">
+                                        <option selected="selected">Ikke utlånt</option>
+                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-default">Lagre</button>
                                 <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Avbryt</button>

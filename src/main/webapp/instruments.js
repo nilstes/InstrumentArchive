@@ -66,8 +66,13 @@ $(document).ready(function() {
                 url: 'webresources/instruments/makes',
                 type: 'GET',
                 dataType: 'json'               
+            }),             
+            $.ajax({
+                url: 'webresources/musicians',
+                type: 'GET',
+                dataType: 'json'               
             })
-        ).then(function(instruments, types, makes) {
+        ).then(function(instruments, types, makes, musicians) {
             table = $('#instruments').DataTable( {
                 "paging": true,
                 "lengthChange": true,
@@ -82,6 +87,13 @@ $(document).ready(function() {
                 $('#makes')
                     .append($("<option></option>")
                     .attr("value", value)); 
+            });       
+            
+            $.each(musicians[0], function(key, value) {   
+                $('#lentTo')
+                    .append($("<option></option>")
+                    .attr("value", value.id)
+                    .text(value.firstName + " " + value.lastName)); 
             });       
             
             $.each(types[0], function(key, value) {   
@@ -99,7 +111,7 @@ $(document).ready(function() {
         // Stop form from submitting normally
         event.preventDefault();
         
-        // Save new user
+        // Save new instrument
         $.ajax({
             type: "POST",
             url: "webresources/instruments",
@@ -109,7 +121,8 @@ $(document).ready(function() {
                 productNo: $("#productNo").val(),
                 serialNo: $("#serialNo").val(),
                 description: $("#description").val(),
-                status: $("#status").val()
+                status: $("#status").val(),
+                lentTo: $("#lentTo").val()
             }),
             contentType: "application/json",
             success: function () {
