@@ -58,10 +58,12 @@ function init(id, loansTable, statusesTable) {
         // Init types dropdown
         $('#type').empty();
         $.each(types[0], function(key, value) {   
+            var selected = value.name===instrument[0].type?"selected":null;
             $('#type')
                 .append($("<option></option>")
-                .attr("value", value.id)
-                .text(value.name)); 
+                    .attr("value", value.id)
+                    .attr("selected", selected)
+                    .text(value.name)); 
         });        
     
         // Init makes dropdown
@@ -87,7 +89,7 @@ function init(id, loansTable, statusesTable) {
         $('#staticProductNo').html(instrument[0].productNo);
         $('#staticSerialNo').html(instrument[0].serialNo);
         $('#staticDescription').html(instrument[0].description);
-        $('#type').select(instrument[0].type);
+//        $('#type').select(instrument[0].type);
         $('#make').val(instrument[0].make);
         $('#productNo').val(instrument[0].productNo);
         $('#serialNo').val(instrument[0].serialNo);
