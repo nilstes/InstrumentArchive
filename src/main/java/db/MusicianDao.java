@@ -29,7 +29,7 @@ public class MusicianDao {
             ResultSet rs = statement.executeQuery();
             List<Musician> musicians = new ArrayList<Musician>();
             while(rs.next()) {
-                musicians.add(new Musician(rs.getString("id"), rs.getString("first_name"), rs.getString("last_name")));
+                musicians.add(new Musician(rs.getString("id"), rs.getString("first_name"), rs.getString("last_name"), rs.getBoolean("has_own_instrument")));
             }               
             rs.close();
             statement.close();
@@ -50,7 +50,7 @@ public class MusicianDao {
             ResultSet rs = statement.executeQuery();
             Musician musician = null;
             if(rs.next()) {
-                musician = new Musician(rs.getString("id"), rs.getString("first_name"), rs.getString("last_name"));
+                musician = new Musician(rs.getString("id"), rs.getString("first_name"), rs.getString("last_name"), rs.getBoolean("has_own_instrument"));
             }               
             rs.close();
             statement.close();
@@ -65,10 +65,11 @@ public class MusicianDao {
     public boolean addMusician(Musician musician) throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
-            PreparedStatement s = connection.prepareStatement("INSERT INTO musician (id, first_name, last_name) VALUES(?,?,?)");
+            PreparedStatement s = connection.prepareStatement("INSERT INTO musician (id, first_name, last_name, has_own_instrument) VALUES(?,?,?,?)");
             s.setString(1, musician.getId());
             s.setString(2, musician.getFirstName());
             s.setString(3, musician.getLastName());
+            s.setBoolean(4, musician.isHasOwnInstrument());
             log.fine(s.toString());
             int result = s.executeUpdate();
             s.close();
@@ -82,10 +83,11 @@ public class MusicianDao {
     public boolean updateMusician(Musician musician) throws SQLException {
         Connection connection = Db.instance().getConnection();
         try {
-            PreparedStatement s = connection.prepareStatement("UPDATE musician set first_name=?, last_name=? where id=?");
+            PreparedStatement s = connection.prepareStatement("UPDATE musician set first_name=?, last_name=?, has_own_instrument=? where id=?");
             s.setString(1, musician.getFirstName());
             s.setString(2, musician.getLastName());
-            s.setString(3, musician.getId());
+            s.setBoolean(3, musician.isHasOwnInstrument());            
+            s.setString(4, musician.getId());
             log.fine(s.toString());
             int result = s.executeUpdate();
             s.close();

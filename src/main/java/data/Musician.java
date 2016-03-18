@@ -11,15 +11,18 @@ public class Musician implements Serializable {
     private String id;
     private String firstName;
     private String lastName;
+    private boolean hasOwnInstrument;
+    
     private List<Instrument> instruments = new ArrayList<Instrument>();
 
     public Musician() {
     }
 
-    public Musician(String id, String firstName, String lastName) {
+    public Musician(String id, String firstName, String lastName, boolean hasOwnInstrument) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.hasOwnInstrument = hasOwnInstrument;
     }
 
     public String getId() {
@@ -44,6 +47,14 @@ public class Musician implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public boolean isHasOwnInstrument() {
+        return hasOwnInstrument;
+    }
+
+    public void setHasOwnInstrument(boolean hasOwnInstrument) {
+        this.hasOwnInstrument = hasOwnInstrument;
     }
 
     public List<Instrument> getInstruments() {

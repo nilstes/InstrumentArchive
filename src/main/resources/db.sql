@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS user ( email VARCHAR(256) PRIMARY KEY, salt VARCHAR(256) NOT NULL, password VARBINARY(256) NOT NULL);
 CREATE TABLE IF NOT EXISTS instrument ( id VARCHAR(256) PRIMARY KEY, type VARCHAR(256), make VARCHAR(256), serial VARCHAR(256), product_no VARCHAR(256), description VARCHAR(256) );
-CREATE TABLE IF NOT EXISTS musician ( id VARCHAR(256) PRIMARY KEY, first_name VARCHAR(256), last_name VARCHAR(256) );
+CREATE TABLE IF NOT EXISTS musician ( id VARCHAR(256) PRIMARY KEY, first_name VARCHAR(256), last_name VARCHAR(256), has_own_instrument SMALLINT NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS instrument_type ( id VARCHAR(256) PRIMARY KEY, name VARCHAR(256) );
 CREATE TABLE IF NOT EXISTS instrument_state ( instrument_id VARCHAR(256), date DATETIME, state TEXT, state_by_user VARCHAR(256) );
 CREATE TABLE IF NOT EXISTS musician_instrument ( instrument_id VARCHAR(256), musician_id VARCHAR(256), out_at DATETIME, out_by_user VARCHAR(256), in_at DATETIME, in_by_user VARCHAR(256) );

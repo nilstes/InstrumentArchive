@@ -44,7 +44,8 @@ function initTable(table, data) {
             getEditIcon("edit" + i) + getDeleteIcon("delete" + i),
             data[i].firstName,
             data[i].lastName,
-            createInstrumentLinkList(data[i].instruments)
+            createInstrumentLinkList(data[i].instruments),
+            data[i].hasOwnInstrument?getCheckMark():""
         ]);
     }
     table.draw();
@@ -58,6 +59,7 @@ function initTable(table, data) {
             $('#editMusicianId').val(data[event.data.i].id);
             $('#editMusicianFirstName').val(data[event.data.i].firstName);
             $('#editMusicianLastName').val(data[event.data.i].lastName);
+            $('#editMusicianOwnInstrument').prop('checked', data[event.data.i].hasOwnInstrument);
             $('#editMusicianModal').modal('show');           
         });
     }
@@ -100,7 +102,8 @@ $(document).ready(function() {
             url: "webresources/musicians",
             data: JSON.stringify({
                 firstName: $("#newMusicianFirstName").val(), 
-                lastName: $("#newMusicianLastName").val()
+                lastName: $("#newMusicianLastName").val(),
+                hasOwnInstrument: $("#newMusicianOwnInstrument").is(":checked")
             }),
             contentType: "application/json",
             success: function () {
@@ -124,7 +127,8 @@ $(document).ready(function() {
             data: JSON.stringify({
                 id: $("#editMusicianId").val(), 
                 firstName: $("#editMusicianFirstName").val(), 
-                lastName: $("#editMusicianLastName").val()
+                lastName: $("#editMusicianLastName").val(),
+                hasOwnInstrument: $("#editMusicianOwnInstrument").is(":checked")
             }),
             contentType: "application/json",
             success: function () {

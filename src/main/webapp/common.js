@@ -47,6 +47,10 @@ function getGlyphIcon(icon, id) {
     return "<div class='btn-group'><button id='" + id + "' type='button' class='btn btn-default btn-sm' aria-label='Left Align'><span class='" + icon + "' aria-hidden='true'></span></button></div>";
 }
 
+function getCheckMark() {
+    return "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>";
+}
+
 function handleError(xhr, status, error) {
     if(xhr.status === 401) {
         window.location.href = "loggedout.html";
